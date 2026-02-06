@@ -61,7 +61,7 @@ def minimizer_sketch(sequence: str, k: int = 15, w: int = 50) -> Sketch:
 
     seen: set[int] = set()
     entries = []
-    for win_start in range(max(1, n_kmers - w + 1)):
+    for win_start in range(max(n_kmers - w + 1, 1)):
         win_end = min(win_start + w, n_kmers)
         best = min(hashes[win_start:win_end], key=lambda x: x[0])
         h, pos, kmer = best

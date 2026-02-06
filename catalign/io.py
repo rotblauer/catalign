@@ -63,5 +63,8 @@ def write_fasta(
             else:
                 name, seq = item
             fh.write(f">{name}\n")
-            for i in range(0, max(len(seq), 1), line_width):
-                fh.write(seq[i : i + line_width] + "\n")
+            if seq:
+                for i in range(0, len(seq), line_width):
+                    fh.write(seq[i : i + line_width] + "\n")
+            else:
+                fh.write("\n")
