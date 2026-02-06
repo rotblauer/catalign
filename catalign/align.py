@@ -222,7 +222,7 @@ class CatalignAligner:
                 H[i, j] = min(diag, E[i, j], F[i, j])
 
         # Traceback
-        pairs: list[tuple] = []
+        pairs: List[Tuple[Optional[int], Optional[int], str]] = []
         i, j = n, m
         total_energy = H[n, m] if H[n, m] < INF else 0.0
 

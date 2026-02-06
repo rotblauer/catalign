@@ -54,7 +54,7 @@ def chain_anchors(
     for idx in indices:
         if used[idx]:
             continue
-        chain: list = []
+        chain: List[Tuple[int, int, str]] = []
         cur = idx
         while cur != -1 and not used[cur]:
             chain.append(anchors[cur])

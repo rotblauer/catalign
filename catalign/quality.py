@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from catalign.energy import EnergyModel
 
@@ -103,7 +103,7 @@ def evaluate_quality(
     pairs = alignment.aligned_pairs
 
     # --- Base-level ---
-    base_quals: list[BaseQuality] = []
+    base_quals: List[BaseQuality] = []
     matches = mismatches = insertions = deletions = 0
     total_energy = 0.0
 
@@ -171,11 +171,11 @@ def evaluate_quality(
 
 def _compute_blocks(pairs, em, query_seq, target_seq) -> List[BlockQuality]:
     """Segment aligned pairs into contiguous match/mismatch blocks."""
-    blocks: list[BlockQuality] = []
+    blocks: List[BlockQuality] = []
     if not pairs:
         return blocks
 
-    current: list = []
+    current: List[Tuple[Optional[int], Optional[int], str]] = []
     for pair in pairs:
         _, _, op = pair
         if op in ("M", "X"):

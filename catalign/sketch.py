@@ -26,7 +26,7 @@ class Sketch:
 
     def hash_to_positions(self) -> dict:
         """Map hash -> list of (position, kmer)."""
-        d: dict[int, list] = {}
+        d: dict[int, List[Tuple[int, str]]] = {}
         for h, pos, kmer in self.entries:
             d.setdefault(h, []).append((pos, kmer))
         return d
