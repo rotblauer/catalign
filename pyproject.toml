@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "catalign"
+version = "0.1.0"
+description = "Bioinformatics sequence alignment tool that mimics natural molecular forces"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[project.scripts]
+catalign = "catalign.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
