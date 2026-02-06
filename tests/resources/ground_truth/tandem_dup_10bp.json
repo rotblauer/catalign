@@ -1,0 +1,8 @@
+{
+  "name": "tandem_dup_10bp",
+  "query_file": "synthetic/structural/tandem_dup_10bp_query.fa",
+  "target_file": "synthetic/structural/tandem_dup_10bp_target.fa",
+  "description": "10bp tandem duplication at position 166",
+  "sv_type": "duplication",
+  "sv_size": 10
+}

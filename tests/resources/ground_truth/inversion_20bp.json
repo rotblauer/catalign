@@ -1,0 +1,8 @@
+{
+  "name": "inversion_20bp",
+  "query_file": "synthetic/structural/inversion_20bp_query.fa",
+  "target_file": "synthetic/structural/inversion_20bp_target.fa",
+  "description": "20bp inversion at position 333",
+  "sv_type": "inversion",
+  "sv_size": 20
+}

@@ -1,0 +1,6 @@
+{
+  "name": "interspersed_repeats",
+  "query_file": "synthetic/repetitive/interspersed_repeats_query.fa",
+  "target_file": "synthetic/repetitive/interspersed_repeats_target.fa",
+  "description": "Interspersed repeats (Alu-like) at positions [300, 800, 1400]"
+}

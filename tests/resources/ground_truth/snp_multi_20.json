@@ -1,0 +1,33 @@
+{
+  "name": "snp_multi_20",
+  "query_file": "synthetic/mutations/snp_multi_20_query.fa",
+  "target_file": "synthetic/mutations/snp_multi_20_target.fa",
+  "description": "20 SNPs spread across 200bp",
+  "expected_identity": 0.9,
+  "expected_matches": 180,
+  "expected_mismatches": 20,
+  "expected_insertions": 0,
+  "expected_deletions": 0,
+  "mutation_positions": [
+    13,
+    22,
+    35,
+    38,
+    61,
+    62,
+    63,
+    82,
+    83,
+    101,
+    108,
+    115,
+    116,
+    124,
+    127,
+    135,
+    161,
+    174,
+    181,
+    186
+  ]
+}

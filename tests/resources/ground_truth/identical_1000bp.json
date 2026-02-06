@@ -1,0 +1,12 @@
+{
+  "name": "identical_1000bp",
+  "query_file": "synthetic/identical/identical_1000bp_query.fa",
+  "target_file": "synthetic/identical/identical_1000bp_target.fa",
+  "description": "Identical 1000bp sequences",
+  "expected_cigar": "1000M",
+  "expected_identity": 1.0,
+  "expected_matches": 1000,
+  "expected_mismatches": 0,
+  "expected_insertions": 0,
+  "expected_deletions": 0
+}

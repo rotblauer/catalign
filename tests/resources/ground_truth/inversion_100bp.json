@@ -1,0 +1,8 @@
+{
+  "name": "inversion_100bp",
+  "query_file": "synthetic/structural/inversion_100bp_query.fa",
+  "target_file": "synthetic/structural/inversion_100bp_target.fa",
+  "description": "100bp inversion at position 333",
+  "sv_type": "inversion",
+  "sv_size": 100
+}

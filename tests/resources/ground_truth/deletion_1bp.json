@@ -1,0 +1,12 @@
+{
+  "name": "deletion_1bp",
+  "query_file": "synthetic/indels/deletion_1bp_query.fa",
+  "target_file": "synthetic/indels/deletion_1bp_target.fa",
+  "description": "1bp deletion at position 100",
+  "expected_matches": 199,
+  "expected_insertions": 0,
+  "expected_deletions": 1,
+  "indel_positions": [
+    100
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "benchmark_100kb",
+  "query_file": "benchmarks/benchmark_100kb_query.fa",
+  "target_file": "benchmarks/benchmark_100kb_target.fa",
+  "description": "Benchmark 100kb with ~1% divergence",
+  "expected_identity": 0.99
+}

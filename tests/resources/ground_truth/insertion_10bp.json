@@ -1,0 +1,12 @@
+{
+  "name": "insertion_10bp",
+  "query_file": "synthetic/indels/insertion_10bp_query.fa",
+  "target_file": "synthetic/indels/insertion_10bp_target.fa",
+  "description": "10bp insertion at position 100",
+  "expected_matches": 200,
+  "expected_insertions": 10,
+  "expected_deletions": 0,
+  "indel_positions": [
+    100
+  ]
+}

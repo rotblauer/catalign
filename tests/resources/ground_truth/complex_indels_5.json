@@ -1,0 +1,13 @@
+{
+  "name": "complex_indels_5",
+  "query_file": "synthetic/indels/complex_indels_5_query.fa",
+  "target_file": "synthetic/indels/complex_indels_5_target.fa",
+  "description": "Complex case with 5 indels",
+  "indel_positions": [
+    83,
+    170,
+    250,
+    335,
+    416
+  ]
+}

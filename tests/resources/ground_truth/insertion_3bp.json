@@ -1,0 +1,12 @@
+{
+  "name": "insertion_3bp",
+  "query_file": "synthetic/indels/insertion_3bp_query.fa",
+  "target_file": "synthetic/indels/insertion_3bp_target.fa",
+  "description": "3bp insertion at position 100",
+  "expected_matches": 200,
+  "expected_insertions": 3,
+  "expected_deletions": 0,
+  "indel_positions": [
+    100
+  ]
+}

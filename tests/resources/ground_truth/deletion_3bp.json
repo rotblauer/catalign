@@ -1,0 +1,12 @@
+{
+  "name": "deletion_3bp",
+  "query_file": "synthetic/indels/deletion_3bp_query.fa",
+  "target_file": "synthetic/indels/deletion_3bp_target.fa",
+  "description": "3bp deletion at position 100",
+  "expected_matches": 197,
+  "expected_insertions": 0,
+  "expected_deletions": 3,
+  "indel_positions": [
+    100
+  ]
+}

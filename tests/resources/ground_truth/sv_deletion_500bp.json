@@ -1,0 +1,8 @@
+{
+  "name": "sv_deletion_500bp",
+  "query_file": "synthetic/structural/sv_deletion_500bp_query.fa",
+  "target_file": "synthetic/structural/sv_deletion_500bp_target.fa",
+  "description": "500bp structural deletion at position 666",
+  "sv_type": "deletion",
+  "sv_size": 500
+}

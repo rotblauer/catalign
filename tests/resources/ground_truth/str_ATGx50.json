@@ -1,0 +1,7 @@
+{
+  "name": "str_ATGx50",
+  "query_file": "synthetic/repetitive/str_ATGx50_query.fa",
+  "target_file": "synthetic/repetitive/str_ATGx50_target.fa",
+  "description": "Simple tandem repeat: ATG x 50",
+  "expected_identity": 1.0
+}

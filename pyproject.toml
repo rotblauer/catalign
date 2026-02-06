@@ -16,6 +16,25 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
+    "pytest-cov",
+]
+viz = [
+    "plotly>=5.0",
+    "streamlit>=1.20",
+    "pillow",
+]
+bench = [
+    "pytest-benchmark",
+    "memory-profiler",
+]
+dev = [
+    "catalign[test,viz,bench]",
+    "black",
+    "ruff",
+    "mypy",
+]
+all = [
+    "catalign[test,viz,bench]",
 ]
 
 [project.scripts]
@@ -23,3 +42,19 @@ catalign = "catalign.cli:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "benchmark: marks benchmark tests",
+    "viz: marks visualization tests",
+]
+
+[tool.coverage.run]
+source = ["catalign"]
+omit = ["catalign/viz/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise ImportError",
+]

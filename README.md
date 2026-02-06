@@ -6,6 +6,26 @@ Catalign is a bioinformatics sequence alignment tool that mimics natural molecul
 
 ---
 
+## Quick Demo with Real Data
+
+The fastest way to see Catalign in action with real genomic data:
+
+```bash
+# Install with visualization support
+pip install catalign[viz]
+
+# Run the mitochondrial genome demo
+python examples/mito_demo.py
+```
+
+This downloads human mitochondrial sequences from NCBI and generates:
+- Interactive dot plots showing sequence similarity
+- Energy and identity heatmaps
+- CIGAR string visualizations
+- Quality assessment reports
+
+See `examples/README.md` for more demo options.
+
 ## Why Catalign?
 
 Current sequence aligners (minimap2, BWA-MEM, LAST, …) are engineering marvels, but their scoring models diverge from the biology they serve:
@@ -54,13 +74,19 @@ Current sequence aligners (minimap2, BWA-MEM, LAST, …) are engineering marvels
 pip install catalign
 ```
 
-For development:
+For development with all extras:
 
 ```bash
 git clone https://github.com/your-org/catalign.git
 cd catalign
-pip install -e ".[test]"
+pip install -e ".[dev]"
 ```
+
+Optional dependency groups:
+- `test` — pytest, coverage
+- `viz` — plotly, streamlit (for interactive visualization)
+- `bench` — pytest-benchmark, memory-profiler
+- `all` — all of the above
 
 ## Quick Start
 
@@ -127,6 +153,34 @@ pip install -e ".[test]"
 pytest tests/ -v
 ```
 
+### Generating Synthetic Test Data
+
+Catalign includes a comprehensive synthetic test data generator for validation:
+
+```bash
+python scripts/generate_test_data.py
+```
+
+This creates test sequences in `tests/resources/` with:
+- **Identical sequences** — baseline for 100% identity alignment
+- **SNP mutations** — single and multiple nucleotide polymorphisms
+- **Indels** — insertions and deletions of various sizes
+- **Structural variants** — inversions, tandem duplications, large deletions
+- **Repetitive sequences** — tandem repeats and interspersed elements
+- **Benchmark sequences** — larger sequences for performance testing
+
+Each test case includes a ground truth JSON file with expected alignment properties.
+
+### Running Benchmarks
+
+```bash
+# Run benchmark suite against ground truth
+catalign benchmark --resources-dir tests/resources
+
+# Generate metrics report
+catalign metrics query.fa target.fa --json
+```
+
 The test suite includes synthetic sequences covering:
 - Identical sequence alignment
 - Single-base mismatches
@@ -162,11 +216,65 @@ For whole-genome alignment, future versions will add:
 
 ## Roadmap
 
-- [ ] **Visualisation** — quality heat-maps, dot-plots, and energy landscape plots
+- [x] **Visualisation** — quality heat-maps, dot-plots, energy landscape plots, and interactive dashboard
 - [ ] **GPU acceleration** — CuPy backend for banded DP on large sequences
 - [ ] **Population-scale alignment** — align many samples against a pangenome graph
 - [ ] **RNA-seq support** — splice-aware energy model
 - [ ] **Structural variant calling** — leverage anchor chain breaks as SV evidence
+
+## Interactive Visualization Dashboard
+
+Catalign includes a comprehensive visualization suite for alignment analysis. Launch the interactive dashboard:
+
+```bash
+catalign viz
+# Or specify port
+catalign viz --port 8080
+```
+
+### Python Visualization API
+
+```python
+from catalign import CatalignAligner, evaluate_quality
+from catalign.viz import (
+    create_dotplot,
+    create_energy_heatmap,
+    create_identity_heatmap,
+    visualize_cigar,
+    create_alignment_view,
+)
+
+# Align sequences
+aligner = CatalignAligner()
+aln = aligner.align(query_seq, target_seq)
+
+# Dot plot
+dp = create_dotplot(query_seq, target_seq, k=11)
+fig = dp.to_figure()
+fig.write_html("dotplot.html")
+
+# Energy landscape
+energy_fig = create_energy_heatmap(aln, query_seq, target_seq)
+
+# CIGAR visualization
+cigar_viz = visualize_cigar(aln.cigar)
+cigar_viz.to_figure().show()
+
+# Text alignment view
+view = create_alignment_view(aln, query_seq, target_seq)
+print(view.to_text())
+```
+
+### Visualization Types
+
+| Visualization | Description |
+|--------------|-------------|
+| **Dot Plot** | K-mer match visualization showing sequence similarity patterns |
+| **Energy Heatmap** | Sliding window energy across the alignment |
+| **Identity Heatmap** | Local identity percentage along the alignment |
+| **CIGAR View** | Colored block representation of alignment operations |
+| **Quality Heatmap** | Multi-track view of operation types and energies |
+| **Text Alignment** | Traditional side-by-side alignment with match indicators |
 
 ## License
 

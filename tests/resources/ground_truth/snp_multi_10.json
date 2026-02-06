@@ -1,0 +1,23 @@
+{
+  "name": "snp_multi_10",
+  "query_file": "synthetic/mutations/snp_multi_10_query.fa",
+  "target_file": "synthetic/mutations/snp_multi_10_target.fa",
+  "description": "10 SNPs spread across 200bp",
+  "expected_identity": 0.95,
+  "expected_matches": 190,
+  "expected_mismatches": 10,
+  "expected_insertions": 0,
+  "expected_deletions": 0,
+  "mutation_positions": [
+    7,
+    14,
+    37,
+    77,
+    91,
+    96,
+    125,
+    148,
+    180,
+    182
+  ]
+}

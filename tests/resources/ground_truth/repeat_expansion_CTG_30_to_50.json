@@ -1,0 +1,8 @@
+{
+  "name": "repeat_expansion_CTG_30_to_50",
+  "query_file": "synthetic/repetitive/repeat_expansion_CTG_30_to_50_query.fa",
+  "target_file": "synthetic/repetitive/repeat_expansion_CTG_30_to_50_target.fa",
+  "description": "Repeat expansion: CTG from 30 to 50",
+  "sv_type": "repeat_expansion",
+  "sv_size": 60
+}

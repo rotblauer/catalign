@@ -1,0 +1,14 @@
+{
+  "name": "snp_pos99",
+  "query_file": "synthetic/mutations/snp_pos99_query.fa",
+  "target_file": "synthetic/mutations/snp_pos99_target.fa",
+  "description": "Single SNP at position 99",
+  "expected_identity": 0.99,
+  "expected_matches": 99,
+  "expected_mismatches": 1,
+  "expected_insertions": 0,
+  "expected_deletions": 0,
+  "mutation_positions": [
+    99
+  ]
+}
