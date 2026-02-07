@@ -1,6 +1,27 @@
-"""Catalign: Where sequences find each other like cats find the warmest spot."""
+"""
+Catalign: Where sequences find each other like cats find the warmest spot.
 
-__version__ = "0.1.0"
+⚠️  PROTOTYPE - NOT FOR PRODUCTION USE  ⚠️
+
+This project is an experimental prototype developed using AI-assisted "vibe coding".
+The methods and algorithms have NOT been validated for correctness or biological accuracy.
+Results should NOT be used for clinical, research, or production purposes.
+
+If you need a production aligner, use established tools like minimap2, BWA-MEM, or LAST.
+"""
+
+import warnings as _warnings
+
+__version__ = "0.1.0-alpha"
+
+# Show warning on first import
+_warnings.warn(
+    "catalign is a PROTOTYPE and should NOT be used for production. "
+    "Results have not been validated for correctness. "
+    "See README.md for details.",
+    UserWarning,
+    stacklevel=2
+)
 
 from catalign.energy import EnergyModel
 from catalign.align import CatalignAligner, Alignment

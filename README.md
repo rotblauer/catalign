@@ -1,5 +1,19 @@
 # Catalign
 
+> ⚠️ **PROTOTYPE - NOT FOR PRODUCTION USE** ⚠️
+>
+> **This project is an experimental prototype and was developed using AI-assisted "vibe coding".** 
+> 
+> - The methods and algorithms have **NOT been validated** for correctness or biological accuracy
+> - Results should **NOT be used** for clinical, research, or production purposes
+> - This is a proof-of-concept exploring energy-based alignment ideas
+> - Expect bugs, incomplete features, and potentially incorrect outputs
+> - If you need a production aligner, use established tools like minimap2, BWA-MEM, or LAST
+>
+> **Use at your own risk. Contributions and feedback welcome!**
+
+---
+
 **Where sequences find each other like cats find the warmest spot.**
 
 Catalign is a bioinformatics sequence alignment tool that mimics natural molecular forces for aligning DNA sequences. Instead of arbitrary scoring heuristics, Catalign models alignment as an energy minimisation problem — long-range attraction finds approximate matching regions, short-range forces refine base-level alignment, and the final result is the most energetically stable configuration.
@@ -85,8 +99,56 @@ pip install -e ".[dev]"
 Optional dependency groups:
 - `test` — pytest, coverage
 - `viz` — plotly, streamlit (for interactive visualization)
+- `viewer` — pysam (for BAM/CRAM support)
 - `bench` — pytest-benchmark, memory-profiler
 - `all` — all of the above
+
+## Caliview - Genome Alignment Viewer
+
+Catalign includes **caliview**, a high-performance genome alignment viewer inspired by IGV but optimized for multi-scale alignment visualization.
+
+### Features
+
+- **Multi-scale visualization**: View alignments at base, block, region, and chromosome scales
+- **Custom `.cali` format**: Pre-computed multi-scale metrics for instant browsing
+- **BAM/CRAM support**: Import standard alignment formats
+- **Static binary**: Easy deployment with no dependencies (Rust-based)
+
+### Installation
+
+```bash
+# Build the viewer (requires Rust)
+cd caliview
+cargo build --release
+
+# Or install Python tools
+pip install catalign[viewer]
+```
+
+### Usage
+
+```bash
+# Convert BAM to CALI format
+python -c "from catalign.viewer import bam_to_cali; bam_to_cali('input.bam', 'output.cali')"
+
+# View with caliview (when compiled)
+caliview view output.cali
+```
+
+### Python API
+
+```python
+from catalign.viewer import CaliFile, CaliWriter, MetricsTiler
+
+# Read a CALI file
+cali = CaliFile("alignment.cali")
+tiles = cali.get_tiles("chr1", 0, 1_000_000, tile_size=10_000)
+
+# Generate metrics from alignment
+tiler = MetricsTiler(chromosome_length=100_000, tile_sizes=[1000, 10000])
+# ... add positions ...
+all_tiles = tiler.get_all_tiles()
+```
 
 ## Quick Start
 

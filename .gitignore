@@ -29,3 +29,37 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Rust build artifacts
+target/
+
+# Large genomic data files (except test resources)
+# These patterns exclude real-world large genome files
+*.bam
+*.bam.bai
+*.cram
+*.cram.crai
+*.vcf
+*.vcf.gz
+*.bcf
+
+# Demo output directories (contain large HTML visualizations and downloaded data)
+*_demo_output/
+hg002_t2t_demo/
+na19240_t2t_demo/
+mito_demo_output/
+
+# Large log/output files at root level
+/*.log
+/demo_log.txt
+/*_demo_run.log
+/*_demo_output.txt
+/sv_test_results.txt
+
+# Downloaded genome assemblies (very large)
+# Keep patterns general for any downloaded real-world data
+*.fna.gz
+*_genomic.fna
+*_genomic.fa
+
+

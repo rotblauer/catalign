@@ -1,0 +1,14 @@
+# Catalign Workspace
+#
+# This is a Cargo workspace that includes the caliview viewer.
+# The main Python package is managed via pyproject.toml.
+
+[workspace]
+members = ["caliview"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/catalign/catalign"

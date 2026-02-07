@@ -81,6 +81,322 @@ class AlignmentMetrics:
 
 
 @dataclass
+class StructuralVariant:
+    """Represents a structural variant (large indel, inversion, etc.)."""
+
+    sv_type: str  # "INS", "DEL", "INV", "DUP"
+    query_start: int
+    query_end: int
+    target_start: int
+    target_end: int
+    size: int
+    sequence: str = ""  # For insertions
+
+    def __str__(self) -> str:
+        if self.sv_type == "INS":
+            return f"INS:{self.target_start}:{self.size}bp"
+        elif self.sv_type == "DEL":
+            return f"DEL:{self.target_start}-{self.target_end}:{self.size}bp"
+        else:
+            return f"{self.sv_type}:{self.target_start}-{self.target_end}:{self.size}bp"
+
+    def to_dict(self) -> Dict:
+        return {
+            "type": self.sv_type,
+            "query_start": self.query_start,
+            "query_end": self.query_end,
+            "target_start": self.target_start,
+            "target_end": self.target_end,
+            "size": self.size,
+            "sequence": self.sequence[:50] + "..." if len(self.sequence) > 50 else self.sequence,
+        }
+
+
+def detect_structural_variants(
+    alignment: "Alignment",
+    query_seq: str,
+    target_seq: str,
+    min_sv_size: int = 50,
+) -> List[StructuralVariant]:
+    """Detect structural variants from alignment.
+
+    Uses two approaches:
+    1. Scan CIGAR for runs of insertions or deletions >= min_sv_size
+    2. Detect coordinate jumps (gaps in coverage) that indicate SVs
+
+    Parameters
+    ----------
+    alignment : Alignment
+        The alignment to analyze
+    query_seq : str
+        Query sequence
+    target_seq : str
+        Target sequence
+    min_sv_size : int
+        Minimum size to report as structural variant
+
+    Returns
+    -------
+    List[StructuralVariant]
+        Detected structural variants
+    """
+    svs = []
+    pairs = alignment.aligned_pairs
+
+    if not pairs:
+        return svs
+
+    # Method 1: Look for runs of consecutive I or D operations
+    current_op = None
+    current_run = []
+    runs = []
+
+    for qpos, tpos, op in pairs:
+        if op == current_op:
+            current_run.append((qpos, tpos, op))
+        else:
+            if current_run:
+                runs.append((current_op, current_run))
+            current_op = op
+            current_run = [(qpos, tpos, op)]
+
+    if current_run:
+        runs.append((current_op, current_run))
+
+    # Find large insertions and deletions from runs
+    for op, run in runs:
+        if op == "I" and len(run) >= min_sv_size:
+            q_positions = [p[0] for p in run if p[0] is not None]
+            q_start = min(q_positions) if q_positions else 0
+            q_end = max(q_positions) + 1 if q_positions else 0
+
+            # Find target position from context
+            t_pos = 0
+            for i, (r_op, r_run) in enumerate(runs):
+                if r_op == op and r_run == run:
+                    for j in range(i - 1, -1, -1):
+                        prev_t = [p[1] for p in runs[j][1] if p[1] is not None]
+                        if prev_t:
+                            t_pos = max(prev_t)
+                            break
+                    break
+
+            seq = query_seq[q_start:q_end] if q_start < len(query_seq) else ""
+            svs.append(StructuralVariant(
+                sv_type="INS",
+                query_start=q_start,
+                query_end=q_end,
+                target_start=t_pos,
+                target_end=t_pos,
+                size=len(run),
+                sequence=seq,
+            ))
+
+        elif op == "D" and len(run) >= min_sv_size:
+            t_positions = [p[1] for p in run if p[1] is not None]
+            t_start = min(t_positions) if t_positions else 0
+            t_end = max(t_positions) + 1 if t_positions else 0
+
+            q_pos = 0
+            for i, (r_op, r_run) in enumerate(runs):
+                if r_op == op and r_run == run:
+                    for j in range(i - 1, -1, -1):
+                        prev_q = [p[0] for p in runs[j][1] if p[0] is not None]
+                        if prev_q:
+                            q_pos = max(prev_q)
+                            break
+                    break
+
+            seq = target_seq[t_start:t_end] if t_start < len(target_seq) else ""
+            svs.append(StructuralVariant(
+                sv_type="DEL",
+                query_start=q_pos,
+                query_end=q_pos,
+                target_start=t_start,
+                target_end=t_end,
+                size=len(run),
+                sequence=seq,
+            ))
+
+    # Method 2: Detect coordinate jumps (useful when indels are fragmented)
+    # Track last seen positions
+    last_q = -1
+    last_t = -1
+
+    for qpos, tpos, op in pairs:
+        if qpos is not None and tpos is not None:
+            # Check for query jump (insertion in query)
+            if last_q >= 0 and qpos > last_q + min_sv_size:
+                gap_size = qpos - last_q - 1
+                # Make sure we haven't already detected this
+                already_found = any(
+                    sv.sv_type == "INS" and
+                    abs(sv.query_start - last_q) < 100 and
+                    abs(sv.size - gap_size) < 50
+                    for sv in svs
+                )
+                if not already_found:
+                    seq = query_seq[last_q+1:qpos] if last_q+1 < len(query_seq) else ""
+                    svs.append(StructuralVariant(
+                        sv_type="INS",
+                        query_start=last_q + 1,
+                        query_end=qpos,
+                        target_start=last_t,
+                        target_end=last_t,
+                        size=gap_size,
+                        sequence=seq,
+                    ))
+
+            # Check for target jump (deletion in query)
+            if last_t >= 0 and tpos > last_t + min_sv_size:
+                gap_size = tpos - last_t - 1
+                already_found = any(
+                    sv.sv_type == "DEL" and
+                    abs(sv.target_start - last_t) < 100 and
+                    abs(sv.size - gap_size) < 50
+                    for sv in svs
+                )
+                if not already_found:
+                    seq = target_seq[last_t+1:tpos] if last_t+1 < len(target_seq) else ""
+                    svs.append(StructuralVariant(
+                        sv_type="DEL",
+                        query_start=last_q,
+                        query_end=last_q,
+                        target_start=last_t + 1,
+                        target_end=tpos,
+                        size=gap_size,
+                        sequence=seq,
+                    ))
+
+            last_q = qpos
+            last_t = tpos
+
+    # Method 3: Infer from sequence length difference if no SVs found
+    if not svs:
+        len_diff = len(query_seq) - len(target_seq)
+        if abs(len_diff) >= min_sv_size:
+            if len_diff > 0:
+                svs.append(StructuralVariant(
+                    sv_type="INS",
+                    query_start=0,
+                    query_end=0,
+                    target_start=0,
+                    target_end=0,
+                    size=len_diff,
+                    sequence="(inferred from length difference)",
+                ))
+            else:
+                svs.append(StructuralVariant(
+                    sv_type="DEL",
+                    query_start=0,
+                    query_end=0,
+                    target_start=0,
+                    target_end=0,
+                    size=abs(len_diff),
+                    sequence="(inferred from length difference)",
+                ))
+
+    # Sort by target position
+    svs.sort(key=lambda sv: sv.target_start)
+
+    return svs
+
+
+def detect_svs_by_sequence_comparison(
+    query_seq: str,
+    target_seq: str,
+    min_sv_size: int = 50,
+    window_size: int = 1000,
+    kmer_size: int = 15,
+) -> List[StructuralVariant]:
+    """Detect structural variants by direct sequence comparison.
+
+    Uses k-mer anchoring to find homologous regions and identify
+    large insertions/deletions between them.
+
+    Parameters
+    ----------
+    query_seq : str
+        Query sequence
+    target_seq : str
+        Target sequence
+    min_sv_size : int
+        Minimum SV size to report
+    window_size : int
+        Window size for scanning
+    kmer_size : int
+        K-mer size for anchoring
+
+    Returns
+    -------
+    List[StructuralVariant]
+        Detected structural variants
+    """
+    svs = []
+
+    # Build k-mer index of target
+    target_kmers = {}
+    for i in range(len(target_seq) - kmer_size + 1):
+        kmer = target_seq[i:i + kmer_size]
+        if 'N' not in kmer:
+            if kmer not in target_kmers:
+                target_kmers[kmer] = []
+            target_kmers[kmer].append(i)
+
+    # Find anchor points: positions where query and target share k-mers
+    anchors = []  # (query_pos, target_pos)
+    for i in range(0, len(query_seq) - kmer_size + 1, window_size // 10):
+        kmer = query_seq[i:i + kmer_size]
+        if kmer in target_kmers:
+            # Take the best (closest to diagonal) match
+            for t_pos in target_kmers[kmer]:
+                anchors.append((i, t_pos))
+                break  # Just take first match for simplicity
+
+    if len(anchors) < 2:
+        return svs
+
+    # Sort anchors by query position
+    anchors.sort(key=lambda x: x[0])
+
+    # Look for discontinuities between consecutive anchors
+    for i in range(1, len(anchors)):
+        q_prev, t_prev = anchors[i-1]
+        q_curr, t_curr = anchors[i]
+
+        q_diff = q_curr - q_prev
+        t_diff = t_curr - t_prev
+
+        # If query advances more than target -> insertion in query
+        if q_diff > t_diff + min_sv_size:
+            ins_size = q_diff - t_diff
+            svs.append(StructuralVariant(
+                sv_type="INS",
+                query_start=q_prev,
+                query_end=q_prev + ins_size,
+                target_start=t_prev,
+                target_end=t_prev,
+                size=ins_size,
+                sequence=query_seq[q_prev:q_prev + min(ins_size, 100)],
+            ))
+
+        # If target advances more than query -> deletion in query
+        elif t_diff > q_diff + min_sv_size:
+            del_size = t_diff - q_diff
+            svs.append(StructuralVariant(
+                sv_type="DEL",
+                query_start=q_prev,
+                query_end=q_prev,
+                target_start=t_prev,
+                target_end=t_prev + del_size,
+                size=del_size,
+                sequence=target_seq[t_prev:t_prev + min(del_size, 100)],
+            ))
+
+    return svs
+
+
+@dataclass
 class BenchmarkResult:
     """Result of comparing alignment against ground truth."""
 
