@@ -12,6 +12,16 @@
 >
 > **Use at your own risk. Contributions and feedback welcome!**
 
+### AI-generated prototype notice
+
+This repository was produced by iteratively prompting AI models to scaffold and refine a prototype codebase. It has not been independently audited or scientifically validated. Expect rough edges, inconsistent style, and spots where automated generation may have introduced subtle mistakes. Please review carefully before relying on any results.
+
+**AI-prone hotspots to review:**
+- `catalign.align.CatalignAligner._banded_align`: uses a simple diagonal band estimated from sequence lengths; alignments far off-diagonal or with large indels may be clipped or mis-scored.
+- `catalign.chain.chain_anchors`: heuristic DP with a fixed look-back window and no strand/orientation handling; inversions or distant anchors can be missed, and chaining is O(n²) within the window.
+- `catalign.quality.evaluate_quality`: gap costs are simplified (gap_open applied per event, no gap extension), energy totals may not match the DP scoring, and coverage is based on set cardinality rather than contiguous spans.
+- `catalign.sketch.minimizer_sketch`: hashes are not canonicalized for reverse complements and use a basic rolling hash; collisions or strand issues can lead to missing/extra anchors.
+
 ---
 
 **Where sequences find each other like cats find the warmest spot.**
